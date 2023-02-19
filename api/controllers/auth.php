@@ -1,9 +1,9 @@
 <?php
-DI::rest()->post('/auth/register/:usertype', ['email', 'fullname', 'phone'], function (RestData $data) {
+DI::rest()->post('/auth/register/:usertype', ['first_name', 'last_name', 'street', 'city', 'gender','phone','email'], function (RestData $data) {
     $usertype = $data->pathdata['usertype'];
     $body = $data->request->getBody();
 
-    if (!nullcheck($body, ['email', 'fullname', 'phone'])) {
+    if (!nullcheck($body, ['first_name', 'last_name', 'street', 'city', 'gender','phone','email'])) {
         http(400, 'Mangler data');
     }
 
