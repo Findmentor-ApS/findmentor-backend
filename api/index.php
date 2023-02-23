@@ -11,6 +11,7 @@ include "envs/.env.php";
 include "envs/.env.global.php";
 include "dependencies/index.php";
 include "funcs/funcs.sql.php";
+include "funcs/funcs.mail.php";
 include "middlewares/index.php";
 include "controllers/index.php";
 http(404);
