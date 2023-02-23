@@ -47,7 +47,7 @@ DI::rest()->get('/auth/validate_email/:usertype/:token', function (RestData $dat
         $user['email_verified'] = true;
 
         R::store($user);
-        http();
+        http(200,json_encode(array('success' => 'Email valideret')));
     }
     http(400);
 });
