@@ -92,41 +92,41 @@ class Rest
         $this->HandleRequest($callable, $middlewares, $entry);
     }
 
-    public function post($entry, $allowed_data, $callable, $middlewares = [])
+    public function post($entry, $callable, $middlewares = [])
     {
-        if ($this->request->getMethod() != 'POST' || !$this->_validate_path($entry) || !$this->checkData($allowed_data)) {
+        if ($this->request->getMethod() != 'POST' || !$this->_validate_path($entry)) {
             return;
         }
         $this->HandleRequest($callable, $middlewares, $entry);
     }
 
-    public function put($entry, $allowed_data, $callable, $middlewares = [])
+    public function put($entry, $callable, $middlewares = [])
     {
-        if ($this->request->getMethod() != 'PUT' || !$this->_validate_path($entry) || !$this->checkData($allowed_data)) {
+        if ($this->request->getMethod() != 'PUT' || !$this->_validate_path($entry)) {
             return;
         }
         $this->HandleRequest($callable, $middlewares, $entry);
     }
 
-    public function delete($entry, $allowed_data, $callable, $middlewares = [])
+    public function delete($entry, $callable, $middlewares = [])
     {
-        if ($this->request->getMethod() != 'DELETE' || !$this->_validate_path($entry) || !$this->checkData($allowed_data)) {
+        if ($this->request->getMethod() != 'DELETE' || !$this->_validate_path($entry)) {
             return;
         }
         $this->HandleRequest($callable, $middlewares, $entry);
     }
 
-    public function patch($entry, $allowed_data, $callable, $middlewares = [])
+    public function patch($entry, $callable, $middlewares = [])
     {
-        if ($this->request->getMethod() != 'PATCH' || !$this->_validate_path($entry) || !$this->checkData($allowed_data)) {
+        if ($this->request->getMethod() != 'PATCH' || !$this->_validate_path($entry)) {
             return;
         }
         $this->HandleRequest($callable, $middlewares, $entry);
     }
 
-    public function resource($entry, $allowed_data, $callable, $middlewares = [])
+    public function resource($entry, $callable, $middlewares = [])
     {
-        if (!$this->_validate_path($entry) || !$this->checkData($allowed_data)) {
+        if (!$this->_validate_path($entry)) {
             return;
         }
         $this->HandleRequest($callable, $middlewares, $entry);
