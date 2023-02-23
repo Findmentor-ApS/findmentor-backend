@@ -1,5 +1,6 @@
 <?php
-$ENV['APP'] = 'Findmentor';
+$ENV['APPNAME'] = 'Findmentor';
+$ENV['APP'] = 'findmentor.localhost';
 $ENV['TWILIO_SID'] = 'AC6126c75e2973e9bd0176ffcab1a7a235';
 $ENV['TWILIO_TOKEN'] = '192f9afebb2eff2450acd28cfd47131a';
 $ENV['USER_REGISTER_TYPES'] = ['user', 'mentor'];

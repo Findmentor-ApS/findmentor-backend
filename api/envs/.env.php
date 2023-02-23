@@ -9,7 +9,8 @@ $ENV = [
 
     'URL' => 'api.findmentor.localhost',
     'API' => 'api.findmentor.localhost',
-    'APP' => 'Findmentor',
+    'APP' => 'findmentor.localhost',
+    'APPNAME' => 'Findmentor',
 
 
     'TOKEN_LIFETIME' => -1,

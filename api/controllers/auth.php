@@ -54,17 +54,20 @@ DI::rest()->get('/auth/validate_email/:usertype/:token', function (RestData $dat
 
 DI::rest()->get('/auth/validate_login/:usertype/:token', function (RestData $data) {
     $usertype = $data->pathdata['usertype'];
+    $login_token = $data->pathdata['token'];
 
     if (in_array($usertype, DI::env('USER_LOGIN_TYPES')) === false) {
         http(404);
     }
 
-    $user = R::findOne($usertype, 'login_token = ?', [$data->pathdata['token']]);
+
+    $user = R::findOne($usertype, 'login_token = ?', [$login_token]);
+
     if ($user) {
         $user['access_token'] = $usertype[0] . randstr(29);
         $user['login_token'] = null;
         R::store($user);
-        http(200, $user['access_token']);
+        http(200,json_encode(array('access_token' => $user['access_token'])));
     }
     http(400);
 });
