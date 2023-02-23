@@ -9,6 +9,8 @@ $ENV = [
 
     'URL' => 'api.findmentor.localhost',
     'API' => 'api.findmentor.localhost',
+    'APP' => 'Findmentor',
+
 
     'TOKEN_LIFETIME' => -1,
     'PHONE_DELAY' => 60 * 5,
