@@ -9,10 +9,11 @@ DI::rest()->delete('/me', [], function (RestData $data) {
     http();
 }, ['auth.loggedIn']);
 
-DI::rest()->put('/me', ['email', 'country_code', 'phone', 'firstname', 'lastname', 'mentor_type', 'gender', 'address', 'zipcode', 'city', 'birthdate', 'education', 'workplace', 'description', 'teaser', 'hourly_rate', 'regnr', 'accnr', 'website'], function (RestData $data) {
+DI::rest()->put('/me', function (RestData $data) {
     $usertype = $data->middleware['usertype'];
     $user = $data->middleware['user'];
     $body = $data->request->getBody();
+
 
     if (isset($body['email']) && $body['email'] != $data['user']['email']) {
         if (!is_email($body['email'])) {
@@ -41,6 +42,23 @@ DI::rest()->put('/me', ['email', 'country_code', 'phone', 'firstname', 'lastname
         $user['phone_verified'] = 0;
         $user['phone_verify_code_date_created'] = time();
     }
+
+    // store user data based on edit-profile variables
+    $user['first_name'] = $body['first_name'];
+    $user['last_name'] = $body['last_name'];
+    $user['street'] = $body['street'];
+    $user['street_no'] = $body['street_no'];
+    $user['street_no'] = $body['street_no'];
+    $user['street_side'] = $body['street_side'];
+    $user['post_code'] = $body['post_code'];
+    $user['city'] = $body['city'];
+    $user['education'] = $body['education'];
+    $user['gender'] = $body['gender'];
+    $user['phone'] = $body['phone'];
+    $user['email'] = $body['email'];
+    $user['linkedin'] = $body['linkedin'];
+    $user['description'] = $body['description'];
+
 
     R::store($user);
 
