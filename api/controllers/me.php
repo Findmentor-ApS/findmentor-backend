@@ -15,7 +15,7 @@ DI::rest()->put('/me', function (RestData $data) {
     $body = $data->request->getBody();
 
 
-    if (isset($body['email']) && $body['email'] != $data['user']['email']) {
+    if (isset($body['email']) && $body['email'] != $user['email']) {
         if (!is_email($body['email'])) {
             http(400, 'Bad email');
         }
@@ -31,17 +31,17 @@ DI::rest()->put('/me', function (RestData $data) {
         $user['verify_email_token_date_created'] = time();
     }
 
-    if (nullcheck($body, ['phone', 'country_code']) && $body['phone'] != $data['user']['phone']) {
-        if (!is_phone($body['country_code'] . $body['phone'])) {
-            http(400, 'Bad phone');
-        }
+    // if (nullcheck($body, ['phone', 'country_code']) && $body['phone'] != $data['user']['phone']) {
+    //     if (!is_phone($body['country_code'] . $body['phone'])) {
+    //         http(400, 'Bad phone');
+    //     }
 
-        $verify_phone = randstr(6, "0123456789");
-        \DI::sms($body['country_code'] . $body['phone'], "Din verificeringskode er: " . $verify_phone);
-        $user['phone_verify'] = $verify_phone;
-        $user['phone_verified'] = 0;
-        $user['phone_verify_code_date_created'] = time();
-    }
+    //     $verify_phone = randstr(6, "0123456789");
+    //     \DI::sms($body['country_code'] . $body['phone'], "Din verificeringskode er: " . $verify_phone);
+    //     $user['phone_verify'] = $verify_phone;
+    //     $user['phone_verified'] = 0;
+    //     $user['phone_verify_code_date_created'] = time();
+    // }
 
     // store user data based on edit-profile variables
     $user['first_name'] = $body['first_name'];
