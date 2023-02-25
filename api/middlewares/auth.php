@@ -1,21 +1,20 @@
 <?php
 
 class Auth {
-    public static function loggedIn(Request $request, array $roles) {
+    public static function loggedIn(Request $request) {
         $headers = $request->getHeaders();
-
-        if (!isset($headers['Authorization'])) {
+        $roles = DI::env('USER_REGISTER_TYPES');
+        if (!isset($headers['Access_token'])) {
             http(401, "Ingen adgang");
         }
 
-        foreach ($roles as $role) {
-            if ($headers['Authorization'][0] == $role[0]) {
-                $user = R::findOne($role, 'access_token=?', [$headers['Authorization']]);
-                if (!$user) {
-                    http(401, "Ingen adgang");
-                }
-                return ["user" => $user, 'usertype' => $role];
-            }
+        foreach ($roles as $role) 
+        {
+            $user = R::findOne($role, 'access_token=?', [$headers['Access_token']]);
+            if($user) return ["user" => $user, 'usertype' => $role];;
+        }   
+        if (!$user) {
+            http(401, "Ingen adgang");
         }
 
         http(401, "Ingen adgang");
