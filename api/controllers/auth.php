@@ -67,7 +67,7 @@ DI::rest()->get('/auth/validate_login/:usertype/:token', function (RestData $dat
         $user['access_token'] = $usertype[0] . randstr(29);
         $user['login_token'] = null;
         R::store($user);
-        http(200,json_encode(array('access_token' => $user['access_token'])));
+        http(200,json_encode(array('access_token' => $user['access_token'], 'type' => $usertype)));
     }
     http(400);
 });
