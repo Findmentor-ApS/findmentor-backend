@@ -118,3 +118,26 @@ DI::rest()->post('/me/verify_phone', ['code'], function (RestData $data) {
     R::store($user);
     http();
 }, ['auth.loggedIn']);
+
+// create end point for updating experiences
+DI::rest()->put('/me/experiences', function (RestData $data) {
+    $usertype = $data->middleware['usertype'];
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+
+    // delete all experiences
+    $experiences = R::find('experience', 'user_id = ?', [$user['id']]);
+    foreach ($experiences as $experience) {
+        R::trash($experience);
+    }
+
+    // create new experiences
+    if($usertype == 'mentor'){
+        foreach ($body as $experience) {
+            $experience['user_id'] = $user['id'];
+            R::store(R::dispense('experience')->import($experience));
+        }
+    }
+
+    http(200, $user, true);
+}, ['auth.loggedIn']);
