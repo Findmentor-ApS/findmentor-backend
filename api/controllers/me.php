@@ -67,6 +67,7 @@ DI::rest()->put('/me', function (RestData $data) {
         $user['phone'] = $body['phone'];
         $user['email'] = $body['email'];
         $user['linkedin'] = $body['linkedin'];
+        $user['is_avaliable'] = $body['is_avaliable'];
         $user['description'] = $body['description'];
     }
 
