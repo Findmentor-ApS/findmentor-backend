@@ -77,7 +77,12 @@ DI::rest()->put('/me', function (RestData $data) {
 }, ['auth.loggedIn']);
 
 DI::rest()->get('/me', function (RestData $data) {
-    http(200, $data->middleware['user'], true);
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+    if($usertype == 'mentor') {
+        $user['experiences'] = R::find('experience', 'mentor_id = ?', [$user['id']]);
+    }
+    http(200, $user, true);
 }, ['auth.loggedIn']);
 
 DI::rest()->get('/me/verify_phone_time', function (RestData $data) {
@@ -124,26 +129,21 @@ DI::rest()->put('/me/experiences', function (RestData $data) {
     $usertype = $data->middleware['usertype'];
     $body = $data->request->getBody();
     $user = $data->middleware['user'];
-    var_dump($body);
 
-    try {
-        $experiences = R::find('experience', 'user_id = ?', [$user['id']]);
-        foreach ($experiences as $experience) {
-            R::trash($experience);
-        }
-
-        foreach ($body as $experienceId) {
-            $experience = R::dispense('experience');
-            $experience['user_id'] = $user['id'];
-            $experience['experience_type_id'] = $experienceId;
-            R::store($experience);
-        }
-
-        $updatedExperiences = R::find('experience', 'user_id = ?', [$user['id']]);
-        http(200, $updatedExperiences, true);
-    } catch (RedBeanPHP\RedException $e) {
-        http(500, ['error' => 'Database error: '.$e->getMessage()]);
+    $experiences = R::find('experience', 'mentor_id = ?', [$user['id']]);
+    foreach ($experiences as $experience) {
+        R::trash($experience);
     }
+
+    foreach ($body['typeExperiences'] as $value) {
+        $experience = R::dispense('experience');
+        $experience['mentor_id'] = $user['id'];
+        $experience['experience_type'] = $value;
+        R::store($experience);
+    }
+
+    $updatedExperiences = R::find('experience', 'mentor_id = ?', [$user['id']]);
+    http(200, $updatedExperiences, true);
 }, ['auth.loggedIn']);
 
 
