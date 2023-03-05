@@ -146,6 +146,97 @@ DI::rest()->put('/me/experiences', function (RestData $data) {
     http(200, $updatedExperiences, true);
 }, ['auth.loggedIn']);
 
+ DI::rest()->put('/me/supportForm', function (RestData $data) {
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    $supportForm = R::find('supportform', 'user_id = ?', [$user['id']]);
+    foreach ($supportForm as $support) {
+        R::trash($support);
+    }
+
+    foreach ($body['supportForm'] as $value) {
+        $support = R::dispense('supportform');
+        $support['user_id'] = $user['id'];
+        $support['support_type'] = $value;
+        R::store($support);
+    }
+
+    $updatedSupportForm = R::find('supportform', 'user_id = ?', [$user['id']]);
+    http(200, $updatedSupportForm, true);
+}, ['auth.loggedIn']);
+
+
+DI::rest()->put('/me/location', function (RestData $data){
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    $locationArr = R::find('location', 'user_id = ?', [$user['id']]);
+    foreach ($locationArr as $location) {
+        R::trash($location);
+    }
+
+    foreach ($body['location'] as $value){
+        $location = R::dispense('location');
+        $location['user_id'] = $user['id'];
+        $location['location'] = $value;
+        R::store($location);
+    }
+
+    $updatedLocationArr = R::find('location', 'user_id = ?', [$user['id']]);
+    http(200, $updatedLocationArr, true);
+}, ['auth.loggedIn']);
+
+
+DI::rest()->put('/me/languages', function (RestData $data){
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    $languagesArr = R::find('language', 'user_id = ?', [$user['id']]);
+    foreach ($languagesArr as $language) {
+        R::trash($language);
+    }
+
+    foreach ($body['languages'] as $value){
+        $language = R::dispense('language');
+        $language['user_id'] = $user['id'];
+        $language['language'] = $value;
+        R::store($language);
+    }
+
+    $updatedLanguagesArr = R::find('language', 'user_id = ?', [$user['id']]);
+    http(200, $updatedLanguagesArr, true);
+}, ['auth.loggedIn']);
+
+
+DI::rest()->put('/me/contacts', function (RestData $data){
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    $contactsArr = R::find('contact', 'user_id = ?', [$user['id']]);
+    foreach ($contactsArr as $contact) {
+        R::trash($contact);
+    }
+
+    foreach ($body['contacts'] as $value){
+        $contact = R::dispense('contact');
+        $contact['user_id'] = $user['id'];
+        $contact['contact'] = $value;
+        R::store($contact);
+    }
+
+    $updatedContactsArr = R::find('contact', 'user_id = ?', [$user['id']]);
+    http(200, $updatedContactsArr, true);
+}, ['auth.loggedIn']);
+
+
+
+
+
 
 
 
