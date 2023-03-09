@@ -6,6 +6,7 @@ include 'Cache.php';
 include 'Discord.php';
 include 'DI.php';
 include "Redbean.php";
+include "Messager.php";
 
 R::setup('mysql:host=' . DI::env('DBHOST') . ';dbname=' . DI::env('DBNAME'), DI::env('DBUSER'), DI::env('DBPASS'));
 R::useFeatureSet('novice/latest');

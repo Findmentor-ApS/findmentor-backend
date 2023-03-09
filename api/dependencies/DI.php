@@ -1,4 +1,6 @@
 <?php
+
+use Pusher\Pusher;
 use Twilio\Rest\Client;
 
 class DI
@@ -6,6 +8,7 @@ class DI
     private static Log $logger;
     private static Rest $rest;
     private static Mail $mail;
+    private static Messager $messager;
     private static Predis\Client $redis;
     private static Cache $cache;
     private static Queue $queue;
@@ -18,6 +21,18 @@ class DI
         }
 
         return SELF::$logger;
+    }
+
+    public static function messager() {
+        $options = array(
+            'cluster' => 'eu',
+            'useTLS' => true
+          );
+        if (!isset(SELF::$messager)) {
+            SELF::$messager = new Messager();
+        }
+
+        return SELF::$messager;
     }
 
     public static function discord() {
