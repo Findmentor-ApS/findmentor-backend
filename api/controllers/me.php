@@ -76,6 +76,17 @@ DI::rest()->put('/me', function (RestData $data) {
     http(200, $user, true);
 }, ['auth.loggedIn']);
 
+// Create endpoint for updating profile picture me/image
+DI::rest()->put('/me/image', function (RestData $data) {
+    $user = $data->middleware['user'];
+    $body = $data->request->getBody();
+
+    $user['profile_picture'] = $body['profile_picture'];
+    R::store($user);
+
+    http(200, $user, true);
+}, ['auth.loggedIn']);
+
 DI::rest()->get('/me', function (RestData $data) {
     $user = $data->middleware['user'];
     $usertype = $data->middleware['usertype'];
