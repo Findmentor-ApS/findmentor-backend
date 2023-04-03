@@ -1,6 +1,7 @@
 <?php
 DI::rest()->get('/mentors/:id', function(RestData $data) {
   $mentor = R::findOne('mentor', 'id=?', [$data->pathdata['id']]);
+  $mentor['experiences'] = R::find('experience', 'mentor_id=?', [$data->pathdata['id']]);
   http(200, $mentor, true);
 });
 
