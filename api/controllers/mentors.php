@@ -21,17 +21,32 @@ DI::rest()->get('/mentors', function(RestData $data) {
   http(200, $mentors, true);
 });
 
-// Create endpoint for updating profile picture me/image
 DI::rest()->post('/mentors/book', function (RestData $data) {
   $user = $data->middleware['user'];
   $body = $data->request->getBody();
   $booking = R::dispense('booking');
   if($data->middleware['usertype'] == 'commune'){
     $booking->commune_id = $user['id'];
-  }elseif($data->middleware['usertype'] == 'user') {
-    $booking->user_id = $user['id'];
   }else{
-    $booking->mentor_id = $user['id'];
+    $booking->user_id = $user['id'];
+  }
+  foreach ($body as $key => $value) {
+      $booking->$key = $value;
+  }
+  R::store($booking);
+
+  http(200, true);
+}, ['auth.loggedIn']);
+
+// Create endpoint for updating profile picture me/image
+DI::rest()->post('/mentors/bookcall', function (RestData $data) {
+  $user = $data->middleware['user'];
+  $body = $data->request->getBody();
+  $booking = R::dispense('call');
+  if($data->middleware['usertype'] == 'commune'){
+    $booking->commune_id = $user['id'];
+  }else{
+    $booking->user_id = $user['id'];
   }
   foreach ($body as $key => $value) {
       $booking->$key = $value;
