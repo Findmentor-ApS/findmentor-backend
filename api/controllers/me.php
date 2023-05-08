@@ -252,10 +252,20 @@ DI::rest()->get('/me/bookings', function (RestData $data) {
     $bookings = [];
     if($usertype == 'mentor') {
         $bookings = R::find('booking', 'mentor_id = ?', [$user['id']]);
+        foreach ($bookings as $booking) {
+            $booking['users'] = R::find('user', 'id = ?', [$booking['user_id']]);
+            $booking['communes'] = R::findOne('commune', 'id = ?', [$booking['commune_id']]);
+        }
     } else if($usertype == 'commune') {
         $bookings = R::find('booking', 'commune_id = ?', [$user['id']]);
+        foreach ($bookings as $booking) {
+            $booking['mentor'] = R::findOne('mentor', 'id = ?', [$booking['mentor_id']]);
+        }
     } else if($usertype == 'user') {
         $bookings = R::find('booking', 'user_id = ?', [$user['id']]);
+        foreach ($bookings as $booking) {
+            $booking['mentor'] = R::findOne('mentor', 'id = ?', [$booking['mentor_id']]);
+        }
     }
     http(200, $bookings, true);
 }, ['auth.loggedIn']);
