@@ -94,6 +94,7 @@ DI::rest()->get('/me', function (RestData $data) {
     if($usertype == 'mentor') {
         $user['experiences'] = R::find('experience', 'mentor_id = ?', [$user['id']]);
         $user['contacts'] = R::find('contact', 'mentor_id = ?', [$user['id']]);
+        $user['languages'] = R::find('language', 'mentor_id = ?', [$user['id']]);
     }
     http(200, $user, true);
 }, ['auth.loggedIn']);
@@ -208,19 +209,19 @@ DI::rest()->put('/me/languages', function (RestData $data){
     $user = $data->middleware['user'];
     $usertype = $data->middleware['usertype'];
 
-    $languagesArr = R::find('language', 'user_id = ?', [$user['id']]);
+    $languagesArr = R::find('language', 'mentor_id = ?', [$user['id']]);
     foreach ($languagesArr as $language) {
         R::trash($language);
     }
 
-    foreach ($body['languages'] as $value){
+    foreach ($body['typeLanguages'] as $value){
         $language = R::dispense('language');
-        $language['user_id'] = $user['id'];
-        $language['language'] = $value;
+        $language['mentor_id'] = $user['id'];
+        $language['language_type'] = $value;
         R::store($language);
     }
 
-    $updatedLanguagesArr = R::find('language', 'user_id = ?', [$user['id']]);
+    $updatedLanguagesArr = R::find('language', 'mentor_id = ?', [$user['id']]);
     http(200, $updatedLanguagesArr, true);
 }, ['auth.loggedIn']);
 
