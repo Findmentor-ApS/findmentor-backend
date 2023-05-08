@@ -87,11 +87,13 @@ DI::rest()->put('/me/image', function (RestData $data) {
     http(200, $user, true);
 }, ['auth.loggedIn']);
 
+
 DI::rest()->get('/me', function (RestData $data) {
     $user = $data->middleware['user'];
     $usertype = $data->middleware['usertype'];
     if($usertype == 'mentor') {
         $user['experiences'] = R::find('experience', 'mentor_id = ?', [$user['id']]);
+        $user['contacts'] = R::find('contact', 'mentor_id = ?', [$user['id']]);
     }
     http(200, $user, true);
 }, ['auth.loggedIn']);
@@ -226,21 +228,20 @@ DI::rest()->put('/me/languages', function (RestData $data){
 DI::rest()->put('/me/contacts', function (RestData $data){
     $body = $data->request->getBody();
     $user = $data->middleware['user'];
-    $usertype = $data->middleware['usertype'];
 
-    $contactsArr = R::find('contact', 'user_id = ?', [$user['id']]);
+    $contactsArr = R::find('contact', 'mentor_id = ?', [$user['id']]);
     foreach ($contactsArr as $contact) {
         R::trash($contact);
     }
 
-    foreach ($body['contacts'] as $value){
+    foreach ($body['typeContacts'] as $value){
         $contact = R::dispense('contact');
-        $contact['user_id'] = $user['id'];
-        $contact['contact'] = $value;
+        $contact['mentor_id'] = $user['id'];
+        $contact['contact_type'] = $value;
         R::store($contact);
     }
 
-    $updatedContactsArr = R::find('contact', 'user_id = ?', [$user['id']]);
+    $updatedContactsArr = R::find('contact', 'mentor_id = ?', [$user['id']]);
     http(200, $updatedContactsArr, true);
 }, ['auth.loggedIn']);
 
