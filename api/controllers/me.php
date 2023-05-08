@@ -244,6 +244,24 @@ DI::rest()->put('/me/contacts', function (RestData $data){
     http(200, $updatedContactsArr, true);
 }, ['auth.loggedIn']);
 
+// get bookings for mentor and commune
+DI::rest()->put('/me/bookings', function (RestData $data){
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    if($usertype == 'commune') {
+        $bookings = R::find('booking', 'commune_id = ?', [$user['id']]);
+    }
+    elseif($usertype == 'mentor'){
+        $bookings = R::find('booking', 'recipient_id = ?', [$user['id']]);
+    }
+    else{
+        $bookings = R::find('booking', 'user_id = ?', [$user['id']]);
+    }
+}, ['auth.loggedIn']);
+
+
 
 
 

@@ -33,6 +33,7 @@ DI::rest()->post('/mentors/book', function (RestData $data) {
   foreach ($body as $key => $value) {
       $booking->$key = $value;
   }
+  $booking->created_at = date('Y-m-d H:i:s');
   R::store($booking);
 
   http(200, true);
@@ -51,6 +52,7 @@ DI::rest()->post('/mentors/bookcall', function (RestData $data) {
   foreach ($body as $key => $value) {
       $booking->$key = $value;
   }
+  $booking->created_at = date('Y-m-d H:i:s');
   R::store($booking);
 
   http(200, true);
