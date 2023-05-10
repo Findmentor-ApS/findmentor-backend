@@ -21,7 +21,7 @@ DI::rest()->post('/auth/register/:usertype', function (RestData $data) {
     $body['verify_email_token'] = randstr();
     $body['email_verified'] = false;
     $body['validated'] = false;
-    $body['is_avaliable'] = false;
+    $body['is_available'] = false;
     $body['created'] = time();
 
     $user = R::dispense($usertype);

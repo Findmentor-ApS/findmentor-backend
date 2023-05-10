@@ -67,7 +67,6 @@ DI::rest()->put('/me', function (RestData $data) {
         $user['phone'] = $body['phone'];
         $user['email'] = $body['email'];
         $user['linkedin'] = $body['linkedin'];
-        $user['is_avaliable'] = $body['is_avaliable'];
         $user['description'] = $body['description'];
     }
 
@@ -269,6 +268,20 @@ DI::rest()->get('/me/bookings', function (RestData $data) {
         }
     }
     http(200, $bookings, true);
+}, ['auth.loggedIn']);
+
+// Change settings for user,mentor or commune
+DI::rest()->put('/me/settings', function (RestData $data) {
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+    $body = $data->request->getBody();
+
+    if($usertype == 'mentor'){
+        $user['is_available'] = $body['is_available'];
+    }
+    R::store($user);
+
+    http(200, $user, true);
 }, ['auth.loggedIn']);
 
 
