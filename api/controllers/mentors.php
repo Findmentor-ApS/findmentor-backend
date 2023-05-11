@@ -57,3 +57,22 @@ DI::rest()->post('/mentors/bookcall', function (RestData $data) {
 
   http(200, true);
 }, ['auth.loggedIn']);
+
+// Create endpoint for updating profile picture me/image
+DI::rest()->post('/mentors/profilevisited', function (RestData $data) {
+  $user = $data->middleware['user'];
+  $body = $data->request->getBody();
+  $visit = R::dispense('visit');
+  if($data->middleware['usertype'] == 'commune'){
+    $visit->commune_id = $user['id'];
+  }else{
+    $visit->user_id = $user['id'];
+  }
+  foreach ($body as $key => $value) {
+      $visit->$key = $value;
+  }
+  $visit->created_at = date('Y-m-d H:i:s');
+  R::store($visit);
+
+  http(200, true);
+}, ['auth.loggedIn']);
