@@ -164,4 +164,13 @@ function getMentorsSearch($query, $page, $perPage) {
         "result" => $mentors,
         "totalItems" => $count
     ];
-}    
+}
+
+function fetchUser($user, $usertype) {
+    if($usertype == 'mentor') {
+        $user['experiences'] = R::find('experience', 'mentor_id = ?', [$user['id']]);
+        $user['contacts'] = R::find('contact', 'mentor_id = ?', [$user['id']]);
+        $user['languages'] = R::find('language', 'mentor_id = ?', [$user['id']]);
+    }
+    return $user;
+}

@@ -69,8 +69,9 @@ DI::rest()->put('/me', function (RestData $data) {
         $user['linkedin'] = $body['linkedin'];
         $user['description'] = $body['description'];
     }
-
+    
     R::store($user);
+    $user = fetchUser($user, $usertype);
 
     http(200, $user, true);
 }, ['auth.loggedIn']);
@@ -90,11 +91,8 @@ DI::rest()->put('/me/image', function (RestData $data) {
 DI::rest()->get('/me', function (RestData $data) {
     $user = $data->middleware['user'];
     $usertype = $data->middleware['usertype'];
-    if($usertype == 'mentor') {
-        $user['experiences'] = R::find('experience', 'mentor_id = ?', [$user['id']]);
-        $user['contacts'] = R::find('contact', 'mentor_id = ?', [$user['id']]);
-        $user['languages'] = R::find('language', 'mentor_id = ?', [$user['id']]);
-    }
+    $user = fetchUser($user, $usertype);
+
     http(200, $user, true);
 }, ['auth.loggedIn']);
 
