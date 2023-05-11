@@ -1,7 +1,8 @@
 <?php
 DI::rest()->get('/mentors/:id', function(RestData $data) {
   $mentor = R::findOne('mentor', 'id=?', [$data->pathdata['id']]);
-  $mentor['experiences'] = R::find('experience', 'mentor_id=?', [$data->pathdata['id']]);
+  $user = fetchUser($mentor, 'mentor');
+
   http(200, $mentor, true);
 });
 
@@ -62,12 +63,18 @@ DI::rest()->post('/mentors/bookcall', function (RestData $data) {
 DI::rest()->post('/mentors/profilevisited', function (RestData $data) {
   $user = $data->middleware['user'];
   $body = $data->request->getBody();
-  $visit = R::dispense('visit');
-  if($data->middleware['usertype'] == 'commune'){
-    $visit->commune_id = $user['id'];
-  }else{
-    $visit->user_id = $user['id'];
+  $userIdKey = ($data->middleware['usertype'] == 'commune') ? 'commune_id' : 'user_id';
+  $today = date('Y-m-d');
+
+  // Check if a visit for the current user already exists today
+  $existingVisit = R::findOne('visit', "$userIdKey = ? AND DATE(created_at) = ?", [$user['id'], $today]);
+  if ($existingVisit) {
+    http(200, true);
+    return;
   }
+
+  $visit = R::dispense('visit');
+  $visit->$userIdKey = $user['id'];
   foreach ($body as $key => $value) {
       $visit->$key = $value;
   }
@@ -76,3 +83,4 @@ DI::rest()->post('/mentors/profilevisited', function (RestData $data) {
 
   http(200, true);
 }, ['auth.loggedIn']);
+
