@@ -1,9 +1,13 @@
 <?php
 DI::rest()->get('/mentors/:id', function(RestData $data) {
-  $mentor = R::findOne('mentor', 'id=?', [$data->pathdata['id']]);
-  $user = fetchUser($mentor, 'mentor');
-
-  http(200, $mentor, true);
+  $mentor = R::findOne('mentor', 'id=? AND is_available = ?', [$data->pathdata['id'], true]);
+  
+  if (!$mentor) {
+    http(404, 'The mentor is not available.');
+  } else {
+    $mentor = fetchUser($mentor, 'mentor');
+    http(200, $mentor, true);
+  }
 });
 
 DI::rest()->get('/mentors', function(RestData $data) {

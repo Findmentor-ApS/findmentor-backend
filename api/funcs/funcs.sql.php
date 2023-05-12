@@ -171,6 +171,17 @@ function fetchUser($user, $usertype) {
         $user['experiences'] = R::find('experience', 'mentor_id = ?', [$user['id']]);
         $user['contacts'] = R::find('contact', 'mentor_id = ?', [$user['id']]);
         $user['languages'] = R::find('language', 'mentor_id = ?', [$user['id']]);
+
+
+        $start_of_week = new DateTime('this week');
+        $end_of_week = new DateTime('next week');
+        //
+        $user['bookingsTotal'] = R::count('booking', 'mentor_id = ?', [$user['id']]);
+        $user['callsTotal'] = R::count('call', 'mentor_id = ?', [$user['id']]);
+        $user['visitsTotal'] = R::count('visit', 'mentor_id = ?', [$user['id']]);
+        $user['bookingsTotalWeek'] = R::count('booking', 'mentor_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
+        $user['callsTotalWeek'] = R::count('call', 'mentor_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
+        $user['visitsTotalWeek'] = R::count('visit', 'mentor_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
     }
     return $user;
 }
