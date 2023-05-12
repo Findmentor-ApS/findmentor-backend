@@ -171,6 +171,7 @@ function fetchUser($user, $usertype) {
         $user['experiences'] = R::find('experience', 'mentor_id = ?', [$user['id']]);
         $user['contacts'] = R::find('contact', 'mentor_id = ?', [$user['id']]);
         $user['languages'] = R::find('language', 'mentor_id = ?', [$user['id']]);
+        $user['locations'] = R::find('location', 'mentor_id = ?', [$user['id']]);
 
 
         $start_of_week = new DateTime('this week');

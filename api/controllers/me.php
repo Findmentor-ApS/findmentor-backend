@@ -222,6 +222,26 @@ DI::rest()->put('/me/languages', function (RestData $data){
     http(200, $updatedLanguagesArr, true);
 }, ['auth.loggedIn']);
 
+DI::rest()->put('/me/locations', function (RestData $data){
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    $locationsArr = R::find('location', 'mentor_id = ?', [$user['id']]);
+    foreach ($locationsArr as $location) {
+        R::trash($location);
+    }
+
+    foreach ($body['typeLocations'] as $value){
+        $location = R::dispense('location');
+        $location['mentor_id'] = $user['id'];
+        $location['location_type'] = $value;
+        R::store($location);
+    }
+
+    $updatedLocationsArr = R::find('location', 'mentor_id = ?', [$user['id']]);
+    http(200, $updatedLocationsArr, true);
+}, ['auth.loggedIn']);
 
 DI::rest()->put('/me/contacts', function (RestData $data){
     $body = $data->request->getBody();
