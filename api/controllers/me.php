@@ -263,6 +263,26 @@ DI::rest()->put('/me/contacts', function (RestData $data){
     http(200, $updatedContactsArr, true);
 }, ['auth.loggedIn']);
 
+DI::rest()->put('/me/audiences', function (RestData $data){
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+
+    $audiencesArr = R::find('audience', 'mentor_id = ?', [$user['id']]);
+    foreach ($audiencesArr as $audience) {
+        R::trash($audience);
+    }
+
+    foreach ($body['typeAudiences'] as $value){
+        $audience = R::dispense('audience');
+        $audience['mentor_id'] = $user['id'];
+        $audience['audience_type'] = $value;
+        R::store($audience);
+    }
+
+    $updatedAudienceArr = R::find('audience', 'mentor_id = ?', [$user['id']]);
+    http(200, $updatedAudienceArr, true);
+}, ['auth.loggedIn']);
+
 // get bookings for mentor, commune and user
 DI::rest()->get('/me/bookings', function (RestData $data) {
     $user = $data->middleware['user'];
