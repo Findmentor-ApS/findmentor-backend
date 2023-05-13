@@ -12,17 +12,24 @@ DI::rest()->get('/mentors/:id', function(RestData $data) {
 
 DI::rest()->get('/mentors', function(RestData $data) {
   $query = [
-    'search' => $data->request->getQuery('search'),
-    'location' => $data->request->getQuery('location'),
-    'typeForm' => $data->request->getQuery('typeForm'),
-    'language' => $data->request->getQuery('language'),
-    'gender' => $data->request->getQuery('gender'),
-    'contact' => $data->request->getQuery('contact'),
-    'target' => $data->request->getQuery('target'),
+    'search' => explode(",",$data->request->getQuery()['search']),
+    'location' => explode(",",$data->request->getQuery()['location']),
+    'experience' => explode(",",$data->request->getQuery()['experience']),
+    'language' => explode(",",$data->request->getQuery()['language']),
+    'gender' => explode(",",$data->request->getQuery()['gender']),
+    'contact' => explode(",",$data->request->getQuery()['contact']),
+    'audience' => explode(",",$data->request->getQuery()['audience']),
   ];
-  $page = $data->request->getQuery('page');
-  $perPage = $data->request->getQuery('perpage');
-  $mentors = getMentorsSearch($query, $page, $perPage);
+
+  $page = $data->request->getQuery()['page'];
+  $perPage = $data->request->getQuery()['perpage'];
+  $mentors = searchMentors($query['search'],$query['location'],
+  $query['experience'],
+  $query['language'],
+  $query['gender'],
+  $query['contact'],
+  $query['audience'],
+  $page, $perPage);
   http(200, $mentors, true);
 });
 
