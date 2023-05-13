@@ -201,6 +201,17 @@ DI::rest()->put('/me/location', function (RestData $data){
 }, ['auth.loggedIn']);
 
 
+DI::rest()->post('/me/price', function (RestData $data){
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+
+    $user['price'] = $body['price'];
+    R::store($user);
+
+    http(200, $user, true);
+}, ['auth.loggedIn']);
+
+
 DI::rest()->put('/me/languages', function (RestData $data){
     $body = $data->request->getBody();
     $user = $data->middleware['user'];
