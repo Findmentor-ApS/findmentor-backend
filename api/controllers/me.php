@@ -71,7 +71,7 @@ DI::rest()->put('/me', function (RestData $data) {
     }
     
     R::store($user);
-    $user = fetchUser($user, $usertype);
+    $user = fetchProfile($user, $usertype);
 
     http(200, $user, true);
 }, ['auth.loggedIn']);
@@ -91,7 +91,7 @@ DI::rest()->put('/me/image', function (RestData $data) {
 DI::rest()->get('/me', function (RestData $data) {
     $user = $data->middleware['user'];
     $usertype = $data->middleware['usertype'];
-    $user = fetchUser($user, $usertype);
+    $user = fetchProfile($user, $usertype);
 
     http(200, $user, true);
 }, ['auth.loggedIn']);
