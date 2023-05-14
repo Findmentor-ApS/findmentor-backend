@@ -211,6 +211,16 @@ DI::rest()->post('/me/price', function (RestData $data){
     http(200, $user, true);
 }, ['auth.loggedIn']);
 
+DI::rest()->post('/me/approach', function (RestData $data){
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+
+    $user['approach'] = $body['approach'];
+    R::store($user);
+
+    http(200, $user, true);
+}, ['auth.loggedIn']);
+
 
 DI::rest()->put('/me/languages', function (RestData $data){
     $body = $data->request->getBody();
