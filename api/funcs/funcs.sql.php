@@ -205,7 +205,7 @@ function searchMentors($selectedMentorType, $selectedLocationArr, $selectedTypeF
         FROM mentor 
         WHERE mentor.is_available = 1
         GROUP BY mentor.id
-        ORDER BY score DESC
+        ORDER BY score DESC, mentor.id DESC
         LIMIT ? OFFSET ?',
         array_merge([$selectedMentorType], $selectedGender, $selectedLanguage, $selectedLocationArr, $selectedTypeForm, $selectedContact, $selectedAudience, [$perPage, $offset])
     );
@@ -224,7 +224,7 @@ function searchMentors($selectedMentorType, $selectedLocationArr, $selectedTypeF
     // Return the result
     return [
         'result' => $result,
-        'totalItems' => $totalItems
+        'totalItems' => R::getCell('SELECT COUNT(*) FROM mentor WHERE is_available = 1')
     ];
 }
 
