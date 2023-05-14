@@ -69,6 +69,18 @@ DI::rest()->put('/me', function (RestData $data) {
         $user['linkedin'] = $body['linkedin'];
         $user['description'] = $body['description'];
     }
+    elseif($usertype == 'user'){
+        $user['first_name'] = $body['first_name'];
+        $user['last_name'] = $body['last_name'];
+        $user['street'] = $body['street'];
+        $user['street_no'] = $body['street_no'];
+        $user['street_side'] = $body['street_side'];
+        $user['post_code'] = $body['post_code'];
+        $user['city'] = $body['city'];
+        $user['gender'] = $body['gender'];
+        $user['phone'] = $body['phone'];
+        $user['email'] = $body['email'];
+    }
     
     R::store($user);
     $user = fetchProfile($user, $usertype);
