@@ -10,6 +10,15 @@ DI::rest()->post('/auth/register/:usertype', function (RestData $data) {
         http(404, 'Ikke gyldig bruger');
     }
 
+    if($usertype == 'commune'){
+        $mail = substr($body['email'], strpos($body['email'], "@") + 1);
+        $mailExtension = substr($mail, strpos($mail, ".") + 1);
+        $mailDomain = strtok($mail, '.');
+        if(!array_key_exists($mailDomain, DI::env('DATA.COMMUNES')) || $mailExtension != 'dk'){
+            http(400, 'Mailadressen er ikke en gyldig kommune mail');
+        }
+    }
+
     if (!is_email($body['email'])) {
         http(400, 'Email ikke gyldig');
     }
