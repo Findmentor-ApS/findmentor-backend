@@ -316,30 +316,38 @@ DI::rest()->put('/me/audiences', function (RestData $data){
     http(200, $updatedAudienceArr, true);
 }, ['auth.loggedIn']);
 
-// get bookings for mentor, commune and user
 DI::rest()->get('/me/bookings', function (RestData $data) {
     $user = $data->middleware['user'];
     $usertype = $data->middleware['usertype'];
+    $page = $data->request->getQuery()['page'];
+    $perPage = $data->request->getQuery()['perpage'];
+    $offset = ($page - 1) * $perPage;
     $bookings = [];
+    
     if($usertype == 'mentor') {
-        $bookings = R::find('booking', 'mentor_id = ?', [$user['id']]);
+        $bookings = R::find('booking', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($bookings as $booking) {
             $booking['users'] = R::find('user', 'id = ?', [$booking['user_id']]);
             $booking['communes'] = R::findOne('commune', 'id = ?', [$booking['commune_id']]);
         }
+        $bookings['total'] = R::count('booking', 'mentor_id = ?', [$user['id']]);
     } else if($usertype == 'commune') {
-        $bookings = R::find('booking', 'commune_id = ?', [$user['id']]);
+        $bookings = R::find('booking', 'commune_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($bookings as $booking) {
             $booking['mentor'] = R::findOne('mentor', 'id = ?', [$booking['mentor_id']]);
         }
+        $bookings['total'] = R::count('booking', 'commune_id = ?', [$user['id']]);
     } else if($usertype == 'user') {
-        $bookings = R::find('booking', 'user_id = ?', [$user['id']]);
+        $bookings = R::find('booking', 'user_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($bookings as $booking) {
             $booking['mentor'] = R::findOne('mentor', 'id = ?', [$booking['mentor_id']]);
         }
+        $bookings['total'] = R::count('booking', 'user_id = ?', [$user['id']]);
     }
+
     http(200, $bookings, true);
 }, ['auth.loggedIn']);
+
 
 // Change settings for user,mentor or commune
 DI::rest()->put('/me/settings', function (RestData $data) {
