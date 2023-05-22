@@ -355,6 +355,18 @@ DI::rest()->put('/me/settings', function (RestData $data) {
     http(200, $user, true);
 }, ['auth.loggedIn']);
 
+// delete account for user,mentor or commune have 30 days to restore
+DI::rest()->delete('/me/delete', function (RestData $data) {
+    $user = $data->middleware['user'];
+
+    $user['is_deleted'] = true;
+    $user['deleted_at'] = date('Y-m-d H:i:s');
+
+    R::store($user);
+
+    http(200, $user, true);
+}, ['auth.loggedIn']);
+
 
 
 
