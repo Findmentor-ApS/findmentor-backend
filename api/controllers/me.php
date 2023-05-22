@@ -31,57 +31,26 @@ DI::rest()->put('/me', function (RestData $data) {
         $user['verify_email_token_date_created'] = time();
     }
 
-    // if (nullcheck($body, ['phone', 'country_code']) && $body['phone'] != $data['user']['phone']) {
-    //     if (!is_phone($body['country_code'] . $body['phone'])) {
-    //         http(400, 'Bad phone');
-    //     }
+    $validFields = [
+        'commune' => ['commune_name', 'first_name', 'last_name', 'phone', 'email', 'department', 'ean_nr'],
+        'mentor' => ['first_name', 'last_name', 'street', 'street_no', 
+            'street_side', 'post_code', 'city', 'education', 'gender', 
+            'phone', 'email', 'linkedin', 'description', 'cvr', 'company_name'],
+        'user' => ['first_name', 'last_name', 'street', 'street_no', 'street_side', 'post_code', 'city', 'gender', 'phone', 'email']
+    ];
 
-    //     $verify_phone = randstr(6, "0123456789");
-    //     \DI::sms($body['country_code'] . $body['phone'], "Din verificeringskode er: " . $verify_phone);
-    //     $user['phone_verify'] = $verify_phone;
-    //     $user['phone_verified'] = 0;
-    //     $user['phone_verify_code_date_created'] = time();
-    // }
+    // Check if the usertype exists in our validFields array
+    if (isset($validFields[$usertype])) {
+        foreach ($body as $field => $value) {
+            // If this field is valid for the current user type, store it
+            if (in_array($field, $validFields[$usertype])) {
+                $user[$field] = $value;
+            }
+        }
+    } else {
+        http(400, 'Invalid user type');
+    }
 
-    // store user data based on edit-profile variables
-    if($usertype == 'commune') {
-        $user['commune_name'] = $body['commune_name'];
-        $user['first_name'] = $body['first_name'];
-        $user['last_name'] = $body['last_name'];
-        $user['phone'] = $body['phone'];
-        $user['email'] = $body['email'];
-        $user['department'] = $body['department'];
-        $user['ean_nr'] = $body['ean_nr'];
-    }
-    elseif($usertype == 'mentor'){
-        $user['first_name'] = $body['first_name'];
-        $user['last_name'] = $body['last_name'];
-        $user['street'] = $body['street'];
-        $user['street_no'] = $body['street_no'];
-        $user['street_no'] = $body['street_no'];
-        $user['street_side'] = $body['street_side'];
-        $user['post_code'] = $body['post_code'];
-        $user['city'] = $body['city'];
-        $user['education'] = $body['education'];
-        $user['gender'] = $body['gender'];
-        $user['phone'] = $body['phone'];
-        $user['email'] = $body['email'];
-        $user['linkedin'] = $body['linkedin'];
-        $user['description'] = $body['description'];
-    }
-    elseif($usertype == 'user'){
-        $user['first_name'] = $body['first_name'];
-        $user['last_name'] = $body['last_name'];
-        $user['street'] = $body['street'];
-        $user['street_no'] = $body['street_no'];
-        $user['street_side'] = $body['street_side'];
-        $user['post_code'] = $body['post_code'];
-        $user['city'] = $body['city'];
-        $user['gender'] = $body['gender'];
-        $user['phone'] = $body['phone'];
-        $user['email'] = $body['email'];
-    }
-    
     R::store($user);
     $user = fetchProfile($user, $usertype);
 

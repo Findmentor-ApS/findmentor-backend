@@ -4,3 +4,4 @@ include "mentors.php";
 include "me.php";
 include "test.php";
 include "messages.php";
+include "cvr.php";
