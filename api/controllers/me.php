@@ -318,6 +318,38 @@ DI::rest()->get('/me/bookings', function (RestData $data) {
 }, ['auth.loggedIn']);
 
 
+DI::rest()->get('/me/calls', function (RestData $data) {
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+    $page = $data->request->getQuery()['page'];
+    $perPage = $data->request->getQuery()['perpage'];
+    $offset = ($page - 1) * $perPage;
+    $calls = [];
+    
+    if($usertype == 'mentor') {
+        $calls = R::find('call', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
+        foreach ($calls as $call) {
+            $call['users'] = R::find('user', 'id = ?', [$call['user_id']]);
+            $call['communes'] = R::findOne('commune', 'id = ?', [$call['commune_id']]);
+        }
+        $calls['total'] = R::count('call', 'mentor_id = ?', [$user['id']]);
+    } else if($usertype == 'commune') {
+        $calls = R::find('call', 'commune_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
+        foreach ($calls as $call) {
+            $call['mentor'] = R::findOne('mentor', 'id = ?', [$call['mentor_id']]);
+        }
+        $calls['total'] = R::count('call', 'commune_id = ?', [$user['id']]);
+    } else if($usertype == 'user') {
+        $calls = R::find('call', 'user_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
+        foreach ($calls as $call) {
+            $call['mentor'] = R::findOne('mentor', 'id = ?', [$call['mentor_id']]);
+        }
+        $calls['total'] = R::count('call', 'user_id = ?', [$user['id']]);
+    }
+
+    http(200, $calls, true);
+}, ['auth.loggedIn']);
+
 // Change settings for user,mentor or commune
 DI::rest()->put('/me/settings', function (RestData $data) {
     $user = $data->middleware['user'];
