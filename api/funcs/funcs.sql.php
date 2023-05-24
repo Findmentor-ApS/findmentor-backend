@@ -238,8 +238,11 @@ function fetchUser($user, $usertype) {
         $user['locations'] = R::find('location', 'mentor_id = ?', [$user['id']]);
         $user['audiences'] = R::find('audience', 'mentor_id = ?', [$user['id']]);
     }
-
-    unset($user['access_token'], $user['created'], $user['phone'],
+    // if commune do not unset phone
+    else if ($user['usertype'] == 'user') {
+        unset($user['phone']);
+    }
+    unset($user['access_token'], $user['created'],
         $user['post_code'],$user['street'],$user['street_no'],$user['street_side'],
         $user['login_token'],$user['verify_email_token']);
     return $user;
