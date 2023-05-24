@@ -95,3 +95,20 @@ DI::rest()->post('/mentors/profilevisited', function (RestData $data) {
   http(200, true);
 }, ['auth.loggedIn']);
 
+// Create endpoint for calling mentor
+DI::rest()->post('/mentors/profilecalled', function (RestData $data) {
+  $user = $data->middleware['user'];
+  $body = $data->request->getBody();
+  $booking = R::dispense('outgoing');
+  if($data->middleware['usertype'] !== 'commune'){
+    http(403, 'Kun kommuner kan ringe til mentorer');
+  }
+  foreach ($body as $key => $value) {
+      $booking->$key = $value;
+  }
+  $booking->created_at = date('Y-m-d H:i:s');
+  $booking->commune_id = $user['id'];
+  R::store($booking);
+
+  http(200, true);
+}, ['auth.loggedIn']);

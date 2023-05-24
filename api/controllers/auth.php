@@ -30,6 +30,7 @@ DI::rest()->post('/auth/register/:usertype', function (RestData $data) {
     $body['verify_email_token'] = randstr();
     $body['email_verified'] = false;
     $body['validated'] = false;
+    $body['mentor_type'] = 1;
     $body['is_available'] = false;
     $body['created'] = time();
 
