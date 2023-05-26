@@ -269,3 +269,13 @@ function fetchProfile($user, $usertype) {
     }
     return $user;
 }
+
+function getUserInfo($user_id){
+    $user = R::findOne('user', 'id = ?', [$user_id]);
+    // unset to only get first_name and last_name
+    unset($user['access_token'], $user['created'],
+        $user['post_code'],$user['street'],$user['street_no'],$user['street_side'],
+        $user['login_token'],$user['verify_email_token'],$user['phone'], $user['email'], 
+        $user['deleted_at'], $user['is_deleted']);
+    return $user;
+}
