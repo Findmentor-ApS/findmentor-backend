@@ -111,3 +111,14 @@ function cors()
         exit(0);
     }
 }
+
+function createChannelName($userType1, $userId1, $userType2, $userId2) {
+    $participants = array([$userType1, $userId1], [$userType2, $userId2]);
+
+    // Sort by usertype, then by userId if usertype is equal
+    usort($participants, function($a, $b) {
+        return ($a[0] === $b[0]) ? ($a[1] - $b[1]) : strcmp($a[0], $b[0]);
+    });
+
+    return 'chat-channel-' . $participants[0][0] . $participants[0][1] . '-' . $participants[1][0] . $participants[1][1];
+}
