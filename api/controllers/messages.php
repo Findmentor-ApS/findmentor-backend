@@ -73,12 +73,120 @@ DI::rest()->post('/message/send_message', function (RestData $data) use ($pusher
     $pusher->trigger('chat-channel', 'new-message', $body);
     
     http(200);
-});
+}, ['auth.loggedIn']);
 
-DI::rest()->get('/message/get_messages', function () {
-    // Fetch messages from your database (you can use RedBeanPHP here)
-    $messages = R::findAll('messages');
-    $messagesArray = array_values((array) $messages);
-    // Return messages as JSON
-    http(200, $messagesArray, true);
-});
+// // GEt messages by id and type
+// DI::rest()->get('/message/get_messages/:targetUserType/:targetUserId', function (RestData $data) {
+//     $user = $data->middleware['user'];
+//     $targetUserType = $data->pathdata['targetUserType'];
+//     $targetUserId = (int)$data->pathdata['targetUserId'];
+
+//     $page =(int)$data->request->getQuery('page') ?? 0;
+//     $perPage = 10;
+    
+//     $offset = $page * $perPage;
+//     $messages = R::find(
+//         'messages',
+//         "((sender_id = ? AND receiver_id = ? AND sender_type = ? AND receiver_type = ?) OR
+//           (sender_id = ? AND receiver_id = ? AND sender_type = ? AND receiver_type = ?))
+//          ORDER BY created_at DESC
+//          LIMIT ? OFFSET ?",
+//         [
+//             $user['id'], $targetUserId, $data->middleware['usertype'], $targetUserType,
+//             $targetUserId, $user['id'], $targetUserType, $data->middleware['usertype'],
+//             $perPage, $offset
+//         ]
+//     );
+//     foreach ($messages as $message) {
+//         $message['info'] = R::findOne($targetUserType, 'id = ?', [$targetUserId]);
+//     }
+
+//     http(200, $messages, true);
+// }, ['auth.loggedIn']);
+
+
+DI::rest()->get('/message/get_contacts', function (RestData $data) {
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    // Get contacts
+    $contacts = R::getAll(
+        "SELECT
+            CASE
+                WHEN sender_id = ? THEN receiver_id
+                ELSE sender_id
+            END as contact_id,
+            CASE
+                WHEN sender_id = ? THEN receiver_type
+                ELSE sender_type
+            END as contact_type,
+            CASE
+                WHEN sender_id = ? THEN
+                    CASE
+                        WHEN receiver_type = 'mentor' THEN mentor.first_name
+                        WHEN receiver_type = 'commune' THEN commune.first_name
+                        ELSE usr.first_name
+                    END
+                ELSE
+                    CASE
+                        WHEN sender_type = 'mentor' THEN mentor.first_name
+                        WHEN sender_type = 'commune' THEN commune.first_name
+                        ELSE usr.first_name
+                    END
+            END as first_name,
+            CASE
+                WHEN sender_id = ? THEN
+                    CASE
+                        WHEN receiver_type = 'mentor' THEN mentor.last_name
+                        WHEN receiver_type = 'commune' THEN commune.last_name
+                        ELSE usr.last_name
+                    END
+                ELSE
+                    CASE
+                        WHEN sender_type = 'mentor' THEN mentor.last_name
+                        WHEN sender_type = 'commune' THEN commune.last_name
+                        ELSE usr.last_name
+                    END
+            END as last_name,
+            MAX(created_at) AS last_message_at
+        FROM messages
+        LEFT JOIN mentor ON (sender_id = mentor.id AND sender_type = 'mentor') OR (receiver_id = mentor.id AND receiver_type = 'mentor')
+        LEFT JOIN commune ON (sender_id = commune.id AND sender_type = 'commune') OR (receiver_id = commune.id AND receiver_type = 'commune')
+        LEFT JOIN user AS usr ON (sender_id = usr.id AND sender_type = 'user') OR (receiver_id = usr.id AND receiver_type = 'user')
+        WHERE (sender_id = ? AND sender_type = ?) OR (receiver_id = ? AND receiver_type = ?)
+        GROUP BY contact_id, contact_type, first_name, last_name
+        ORDER BY last_message_at DESC",
+        [$user['id'], $user['id'], $user['id'], $user['id'], $user['id'], $usertype, $user['id'], $usertype]
+    );
+
+    http(200, $contacts, true);
+}, ['auth.loggedIn']);
+
+
+
+
+// generate get_messages_for_contact
+DI::rest()->get('/message/get_messages_for_contact/:targetUserType/:targetUserId', function (RestData $data) {
+    $user = $data->middleware['user'];
+    $targetUserType = $data->pathdata['targetUserType'];
+    $targetUserId = (int)$data->pathdata['targetUserId'];
+
+    $page =(int)$data->request->getQuery('page') ?? 0;
+    $perPage = 10;
+    
+    $offset = $page * $perPage;
+    $messages = R::find(
+        'messages',
+        "((sender_id = ? AND receiver_id = ? AND sender_type = ? AND receiver_type = ?) OR
+          (sender_id = ? AND receiver_id = ? AND sender_type = ? AND receiver_type = ?))
+         ORDER BY created_at DESC
+         LIMIT ? OFFSET ?",
+        [
+            $user['id'], $targetUserId, $data->middleware['usertype'], $targetUserType,
+            $targetUserId, $user['id'], $targetUserType, $data->middleware['usertype'],
+            $perPage, $offset
+        ]
+    );
+    $messages = array_values($messages); 
+    http(200, $messages, true);
+}, ['auth.loggedIn']);
