@@ -183,10 +183,9 @@ DI::rest()->get('/message/get_messages_for_contact/:targetUserType/:targetUserId
     $targetUserType = $data->pathdata['targetUserType'];
     $targetUserId = (int)$data->pathdata['targetUserId'];
 
-    $page =(int)$data->request->getQuery('page') ?? 0;
-    $perPage = 1000;
-    
-    $offset = $page * $perPage;
+    $page =(int)$data->request->getQuery()['page'] ?? 0;
+    $perPage = (int) 10;
+    $offset = (int) ($page * $perPage);
     $messages = R::find(
         'messages',
         "((sender_id = ? AND receiver_id = ? AND sender_type = ? AND receiver_type = ?) OR
