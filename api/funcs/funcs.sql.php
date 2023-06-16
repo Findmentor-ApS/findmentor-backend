@@ -279,3 +279,66 @@ function getUserInfo($user_id){
         $user['deleted_at'], $user['is_deleted']);
     return $user;
 }
+
+function getContacts($userid, $usertype) {
+        // Get contacts
+    return R::getAll(
+        "SELECT
+            CASE
+                WHEN m.sender_id = ? THEN m.receiver_id
+                ELSE m.sender_id
+            END as contact_id,
+            CASE
+                WHEN m.sender_id = ? THEN m.receiver_type
+                ELSE m.sender_type
+            END as contact_type,
+            CASE
+                WHEN m.sender_id = ? THEN
+                    CASE
+                        WHEN m.receiver_type = 'mentor' THEN mentor.first_name
+                        WHEN m.receiver_type = 'commune' THEN commune.first_name
+                        ELSE usr.first_name
+                    END
+                ELSE
+                    CASE
+                        WHEN m.sender_type = 'mentor' THEN mentor.first_name
+                        WHEN m.sender_type = 'commune' THEN commune.first_name
+                        ELSE usr.first_name
+                    END
+            END as first_name,
+            CASE
+                WHEN m.sender_id = ? THEN
+                    CASE
+                        WHEN m.receiver_type = 'mentor' THEN mentor.last_name
+                        WHEN m.receiver_type = 'commune' THEN commune.last_name
+                        ELSE usr.last_name
+                    END
+                ELSE
+                    CASE
+                        WHEN m.sender_type = 'mentor' THEN mentor.last_name
+                        WHEN m.sender_type = 'commune' THEN commune.last_name
+                        ELSE usr.last_name
+                    END
+            END as last_name,
+            MAX(m.created_at) AS last_message_at,
+            last_msg.content AS last_message_content
+        FROM messages AS m
+        LEFT JOIN messages AS last_msg
+            ON last_msg.created_at = (
+                SELECT MAX(created_at)
+                FROM messages
+                WHERE (
+                    (sender_id = m.sender_id AND sender_type = m.sender_type AND receiver_id = m.receiver_id AND receiver_type = m.receiver_type)
+                    OR
+                    (sender_id = m.receiver_id AND sender_type = m.receiver_type AND receiver_id = m.sender_id AND receiver_type = m.sender_type)
+                )
+            )
+        LEFT JOIN mentor ON (m.sender_id = mentor.id AND m.sender_type = 'mentor') OR (m.receiver_id = mentor.id AND m.receiver_type = 'mentor')
+        LEFT JOIN commune ON (m.sender_id = commune.id AND m.sender_type = 'commune') OR (m.receiver_id = commune.id AND m.receiver_type = 'commune')
+        LEFT JOIN user AS usr ON (m.sender_id = usr.id AND m.sender_type = 'user') OR (m.receiver_id = usr.id AND m.receiver_type = 'user')
+        WHERE (m.sender_id = ? AND m.sender_type = ?) OR (m.receiver_id = ? AND m.receiver_type = ?)
+        GROUP BY contact_id, contact_type, first_name, last_name, last_message_content
+        ORDER BY last_message_at DESC",
+        [$userid, $userid, $userid, $userid, $userid, $usertype, $userid, $usertype]
+    );
+}
