@@ -74,15 +74,14 @@ DI::rest()->get('/auth/validate_login/:usertype/:token', function (RestData $dat
 
 
     $user = R::findOne($usertype, 'login_token = ?', [$login_token]);
-
     if ($user) {
         $user['deleted_at'] = null;
         $user['is_deleted'] = false;
         $user['access_token'] = $usertype[0] . randstr(29);
         $user['login_token'] = null;
-        $name = $user['first_name'] . ' ' . $user['last_name'];
         R::store($user);
-        http(200,json_encode(array('access_token' => $user['access_token'], 'type' => $usertype, 'name' => $name)));
+        $user = fetchProfile($user, $usertype);
+        http(200,$user, true);
     }
     http(400);
 });
