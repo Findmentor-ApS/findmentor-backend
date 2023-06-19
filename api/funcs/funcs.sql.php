@@ -322,6 +322,7 @@ function getContacts($userid, $usertype) {
             END as last_name,
             MAX(m.created_at) AS last_message_at,
             last_msg.content AS last_message_content,
+            last_msg.seen AS last_message_seen,
             CASE
                 WHEN last_msg.receiver_id = ? AND last_msg.receiver_type = ? THEN true
                 ELSE false
@@ -341,7 +342,7 @@ function getContacts($userid, $usertype) {
         LEFT JOIN commune ON (m.sender_id = commune.id AND m.sender_type = 'commune') OR (m.receiver_id = commune.id AND m.receiver_type = 'commune')
         LEFT JOIN user AS usr ON (m.sender_id = usr.id AND m.sender_type = 'user') OR (m.receiver_id = usr.id AND m.receiver_type = 'user')
         WHERE (m.sender_id = ? AND m.sender_type = ?) OR (m.receiver_id = ? AND m.receiver_type = ?)
-        GROUP BY contact_id, contact_type, first_name, last_name, last_message_content, is_receiver
+        GROUP BY contact_id, contact_type, first_name, last_name, last_message_content, last_msg.seen, is_receiver
         ORDER BY last_message_at DESC",
         [$userid, $userid, $userid, $userid, $userid, $usertype, $userid, $usertype, $userid, $usertype]
     );

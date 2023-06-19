@@ -10,6 +10,7 @@ DI::rest()->post('/message/send_message', function (RestData $data) use ($pusher
     $receiver_id = $body['receiver_id'];
     $sender_type = $body['sender_type'];
     $receiver_type = $body['receiver_type'];
+    $seen = $body['seen'];
     $created_at = date('Y-m-d H:i:s');
     
     // Store message in your database (you can use RedBeanPHP here)
@@ -20,10 +21,8 @@ DI::rest()->post('/message/send_message', function (RestData $data) use ($pusher
     $message->receiver_type = $receiver_type;
     $message->content = $content; // Make sure 'message' key is present in the request body
     $message->created_at = $created_at;
-    $message->seen = 0;
+    $message->seen = $seen;
     R::store($message);
-
-    // // ...
 
     $channelName = createChannelName($sender_type, $sender_id, $receiver_type, $receiver_id);
     $pusher->trigger($channelName, 'new-message', $body);
@@ -39,7 +38,7 @@ DI::rest()->post('/message/send_message', function (RestData $data) use ($pusher
         'updated_contacts' => $updatedContactsReceiver
     ]);
     
-    http(200);
+    http(200, $message, true);
 }, ['auth.loggedIn']);
 
 DI::rest()->get('/message/get_contacts', function (RestData $data) use ($pusher){
@@ -78,10 +77,41 @@ DI::rest()->get('/message/get_messages_for_contact/:targetUserType/:targetUserId
 
     // Mark the messages as seen
     foreach ($messages as $message) {
-        $message->seen = true;
-        R::store($message); // Save changes to database
+        // if receiver_id and receiver_type is this user, set message seen to true
+        if ($message->receiver_id === $user['id'] && $message->receiver_type === $data->middleware['usertype']) {
+            $message->seen = true;
+            R::store($message);
+        }
     }
+    
 
     $messages = array_values($messages); 
+    http(200, $messages, true);
+}, ['auth.loggedIn']);
+
+
+DI::rest()->post('/message/mark_messages_as_seen', function (RestData $data) use ($pusher) {
+    $body = $data->request->getBody();
+    $messageIds = $body['message_ids'];
+    $sender_type = $body['sender_type'];
+    $sender_id = $body['sender_id'];
+    $receiver_type = $body['receiver_type'];
+    $receiver_id = $body['receiver_id'];
+    $messages = [];
+    // Mark the messages as seen in your database and add it to messages array
+    foreach ($messageIds as $messageId) {
+        $message = R::load('messages', $messageId);
+        $message->seen = true;
+        $messages[] = $message;
+        R::store($message);
+    }
+
+    // Trigger a Pusher event on the existing channel
+    $channelName = createChannelName($sender_type, $sender_id, $receiver_type, $receiver_id);
+    $pusher->trigger($channelName, 'message-seen', [
+        'message_ids' => $messageIds
+    ]);
+
+    $messages= array_values($messages);
     http(200, $messages, true);
 }, ['auth.loggedIn']);
