@@ -20,6 +20,7 @@ DI::rest()->post('/message/send_message', function (RestData $data) use ($pusher
     $message->receiver_type = $receiver_type;
     $message->content = $content; // Make sure 'message' key is present in the request body
     $message->created_at = $created_at;
+    $message->seen = 0;
     R::store($message);
 
     // // ...
@@ -74,6 +75,13 @@ DI::rest()->get('/message/get_messages_for_contact/:targetUserType/:targetUserId
             $perPage, $offset
         ]
     );
+
+    // Mark the messages as seen
+    foreach ($messages as $message) {
+        $message->seen = true;
+        R::store($message); // Save changes to database
+    }
+
     $messages = array_values($messages); 
     http(200, $messages, true);
 }, ['auth.loggedIn']);
