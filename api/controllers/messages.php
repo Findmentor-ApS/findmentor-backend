@@ -22,10 +22,11 @@ DI::rest()->post('/message/send_message', function (RestData $data) use ($pusher
     $message->content = $content; // Make sure 'message' key is present in the request body
     $message->created_at = $created_at;
     $message->seen = $seen;
-    R::store($message);
+    $message_id = R::store($message); 
 
+    $message_data = array_merge((array) $body, ['id' => $message_id]);
     $channelName = createChannelName($sender_type, $sender_id, $receiver_type, $receiver_id);
-    $pusher->trigger($channelName, 'new-message', $body);
+    $pusher->trigger($channelName, 'new-message', $message_data);
 
     $updatedContactsSender = getContacts($sender_id, $sender_type);
 

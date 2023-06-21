@@ -249,6 +249,8 @@ function fetchUser($user, $usertype) {
 }
 
 function fetchProfile($user, $usertype) {
+    $start_of_week = new DateTime('this week');
+    $end_of_week = new DateTime('next week');
     if($usertype == 'mentor') {
         $user['experiences'] = R::find('experience', 'mentor_id = ?', [$user['id']]);
         $user['contacts'] = R::find('contact', 'mentor_id = ?', [$user['id']]);
@@ -256,17 +258,18 @@ function fetchProfile($user, $usertype) {
         $user['locations'] = R::find('location', 'mentor_id = ?', [$user['id']]);
         $user['audiences'] = R::find('audience', 'mentor_id = ?', [$user['id']]);
 
-
-        $start_of_week = new DateTime('this week');
-        $end_of_week = new DateTime('next week');
-        //
-        $user['bookingsTotal'] = R::count('booking', 'mentor_id = ?', [$user['id']]);
-        $user['callsTotal'] = R::count('call', 'mentor_id = ?', [$user['id']]);
-        $user['visitsTotal'] = R::count('visit', 'mentor_id = ?', [$user['id']]);
-        $user['bookingsTotalWeek'] = R::count('booking', 'mentor_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
-        $user['callsTotalWeek'] = R::count('call', 'mentor_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
+        $user['visitsTotal'] = R::count('visit', $usertype . '_id = ?', [$user['id']]);
         $user['visitsTotalWeek'] = R::count('visit', 'mentor_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
+
     }
+
+    $user['bookingsTotal'] = R::count('booking', $usertype . '_id = ?', [$user['id']]);
+    $user['callsTotal'] = R::count('call', $usertype . '_id = ?', [$user['id']]);
+    $user['messagesTotal'] = R::count('messages', 'receiver_id = ? AND receiver_type = ?', [$user['id'], $usertype]);
+    $user['bookingsTotalWeek'] = R::count('booking', $usertype . '_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
+    $user['callsTotalWeek'] = R::count('call', $usertype . '_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
+    $user['messagesTotalWeek'] = R::count('messages', 'receiver_id = ? AND receiver_type = ? AND created_at >= ? AND created_at < ?', [$user['id'], $usertype, $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
+
     return $user;
 }
 
