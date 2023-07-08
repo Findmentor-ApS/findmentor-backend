@@ -319,6 +319,50 @@ DI::rest()->get('/me/bookings', function (RestData $data) {
     http(200, $bookings, true);
 }, ['auth.loggedIn']);
 
+DI::rest()->put('/me/bookings/:id/accept', function (RestData $data) {
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    // if the userType is not a mentor, then return 404
+    if($usertype != 'mentor') {
+        http(404, "Du er ikke en mentor.");
+    }
+
+    $booking = R::findOne('booking', 'id = ? AND mentor_id = ?', [$body['id'], $user['id']]);
+    if (!$booking) {
+        http(404, "Booking ikke fundet.");
+    }
+
+    $booking['status'] = 1; 
+    R::store($booking);
+
+    http(200, $booking, true);
+}, ['auth.loggedIn']);
+
+DI::rest()->put('/me/bookings/:id/decline', function (RestData $data) {
+    $body = $data->request->getBody();
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+
+    // if the userType is not a mentor, then return 404
+    if($usertype != 'mentor') {
+        http(404, "Du er ikke en mentor.");
+    }
+
+    $booking = R::findOne('booking', 'id = ? AND mentor_id = ?', [$body['id'], $user['id']]);
+    if (!$booking) {
+        http(404, "Booking ikke fundet.");
+    }
+
+    $booking['status'] = 0; 
+    R::store($booking);
+
+    http(200, $booking, true);
+}, ['auth.loggedIn']);
+
+
+
 
 DI::rest()->get('/me/calls', function (RestData $data) {
     $user = $data->middleware['user'];
