@@ -46,6 +46,7 @@ DI::rest()->post('/mentors/book', function (RestData $data) {
       $booking->$key = $value;
   }
   $booking->created_at = date('Y-m-d H:i:s');
+  $booking->status = 0;
   R::store($booking);
 
   http(200, true);

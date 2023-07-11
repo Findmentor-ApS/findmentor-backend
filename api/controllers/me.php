@@ -292,16 +292,18 @@ DI::rest()->get('/me/bookings', function (RestData $data) {
     $usertype = $data->middleware['usertype'];
     $page = $data->request->getQuery()['page'];
     $perPage = $data->request->getQuery()['perpage'];
+    $status = $data->request->getQuery()['status'];
     $offset = ($page - 1) * $perPage;
     $bookings = [];
     
     if($usertype == 'mentor') {
-        $bookings = R::find('booking', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
+        // check if status is 0
+        $bookings = R::find('booking', 'mentor_id = ? AND status = ? LIMIT ? OFFSET ?', [$user['id'],$status, $perPage, $offset]);        // $bookings = R::find('booking', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($bookings as $booking) {
             $booking['users'] = getUserInfo($booking['user_id']);
             $booking['communes'] = R::findOne('commune', 'id = ?', [$booking['commune_id']]);
         }
-        $bookings['total'] = R::count('booking', 'mentor_id = ?', [$user['id']]);
+        $bookings['total'] = R::count('booking', 'mentor_id = ?  AND status = ?', [$user['id'],$status]);
     } else if($usertype == 'commune') {
         $bookings = R::find('booking', 'commune_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($bookings as $booking) {
@@ -355,7 +357,7 @@ DI::rest()->put('/me/bookings/:id/decline', function (RestData $data) {
         http(404, "Booking ikke fundet.");
     }
 
-    $booking['status'] = 0; 
+    $booking['status'] = -1; 
     R::store($booking);
 
     http(200, $booking, true);
