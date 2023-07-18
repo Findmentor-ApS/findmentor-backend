@@ -33,6 +33,34 @@ DI::rest()->get('/mentors', function(RestData $data) {
   http(200, $mentors, true);
 });
 
+// make a put request of book
+DI::rest()->put('/mentors/book', function (RestData $data) {
+  $user = $data->middleware['user'];
+  $body = $data->request->getBody();
+
+  $booking = R::findOne('booking', 'id=?', [$body['id']]);
+  if (!$booking) {
+    http(404, 'The booking is not found.');
+  } else {
+    // Check if the booking is made by the current user
+    if ($data->middleware['usertype'] == 'commune' && $booking->commune_id != $user['id']) {
+      http(403, 'You are not allowed to update this booking.');
+    } else if ($data->middleware['usertype'] == 'user' && $booking->user_id != $user['id']) {
+      http(403, 'You are not allowed to update this booking.');
+    }
+
+    // check for each in body and update
+    foreach ($body as $key => $value) {
+      $booking->$key = $value;
+    }
+    $booking->updated_at = date('Y-m-d H:i:s');
+    R::store($booking);
+    http(200, $booking, true);
+  }
+
+  http(200, true);
+}, ['auth.loggedIn']);
+
 DI::rest()->post('/mentors/book', function (RestData $data) {
   $user = $data->middleware['user'];
   $body = $data->request->getBody();
