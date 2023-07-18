@@ -300,20 +300,20 @@ DI::rest()->get('/me/bookings', function (RestData $data) {
         // check if status is 0
         $bookings = R::find('booking', 'mentor_id = ? AND status = ? LIMIT ? OFFSET ?', [$user['id'],$status, $perPage, $offset]);        // $bookings = R::find('booking', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($bookings as $booking) {
-            $booking['users'] = getUserInfo($booking['user_id']);
-            $booking['communes'] = R::findOne('commune', 'id = ?', [$booking['commune_id']]);
+            if($booking['user_id'] != null) $booking['users'] = getUserInfo($booking['user_id']);
+            if($booking['commune_id'] != null) $booking['communes'] = getCommuneInfo($booking['commune_id']);
         }
         $bookings['total'] = R::count('booking', 'mentor_id = ?  AND status = ?', [$user['id'],$status]);
     } else if($usertype == 'commune') {
         $bookings = R::find('booking', 'commune_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($bookings as $booking) {
-            $booking['mentor'] = R::findOne('mentor', 'id = ?', [$booking['mentor_id']]);
+            $booking['mentor'] = getMentorInfo($booking['mentor_id']);
         }
         $bookings['total'] = R::count('booking', 'commune_id = ?', [$user['id']]);
     } else if($usertype == 'user') {
         $bookings = R::find('booking', 'user_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($bookings as $booking) {
-            $booking['mentor'] = R::findOne('mentor', 'id = ?', [$booking['mentor_id']]);
+            $booking['mentor'] = getMentorInfo($booking['mentor_id']);
         }
         $bookings['total'] = R::count('booking', 'user_id = ?', [$user['id']]);
     }
@@ -373,24 +373,27 @@ DI::rest()->get('/me/calls', function (RestData $data) {
     $perPage = $data->request->getQuery()['perpage'];
     $offset = ($page - 1) * $perPage;
     $calls = [];
+
+    
     
     if($usertype == 'mentor') {
-        $calls = R::find('call', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
+        // check if status is 0
+        $calls = R::find('call', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);        // $bookings = R::find('booking', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($calls as $call) {
-            $call['users'] = getUserInfo($call['user_id']);
-            $call['communes'] = R::findOne('commune', 'id = ?', [$call['commune_id']]);
+            if($call['user_id'] != null) $call['users'] = getUserInfo($call['user_id']);
+            if($call['commune_id'] != null) $call['communes'] = getCommuneInfo($call['commune_id']);
         }
         $calls['total'] = R::count('call', 'mentor_id = ?', [$user['id']]);
     } else if($usertype == 'commune') {
         $calls = R::find('call', 'commune_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($calls as $call) {
-            $call['mentor'] = R::findOne('mentor', 'id = ?', [$call['mentor_id']]);
+            $call['mentor'] = getMentorInfo($call['mentor_id']);
         }
         $calls['total'] = R::count('call', 'commune_id = ?', [$user['id']]);
     } else if($usertype == 'user') {
         $calls = R::find('call', 'user_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($calls as $call) {
-            $call['mentor'] = R::findOne('mentor', 'id = ?', [$call['mentor_id']]);
+            $call['mentor'] = getMentorInfo($call['mentor_id']);
         }
         $calls['total'] = R::count('call', 'user_id = ?', [$user['id']]);
     }

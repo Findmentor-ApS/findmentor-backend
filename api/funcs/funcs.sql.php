@@ -273,14 +273,62 @@ function fetchProfile($user, $usertype) {
     return $user;
 }
 
+function getCommuneInfo($commune_id){
+    $commune = R::findOne('commune', 'id = ?', [$commune_id]);
+    // Convert the bean to an array
+    $communeArray = $commune->export();
+
+    // Unset the fields you don't need
+    unset($communeArray['access_token'], $communeArray['created'],
+        $communeArray['post_code'],$communeArray['street'],$communeArray['street_no'],$communeArray['street_side'],
+        $communeArray['login_token'],$communeArray['verify_email_token'],$communeArray['phone'], $communeArray['email'], 
+        $communeArray['deleted_at'], $communeArray['is_deleted'], $communeArray['profile_picture']);
+    
+    $communeNew = R::dispense('commune');
+
+    // Import the values from the array into the new bean
+    $communeNew->import($communeArray);
+
+    return $communeNew;
+}
+
+function getMentorInfo($mentor_id){
+    $mentor = R::findOne('mentor', 'id = ?', [$mentor_id]);
+    // Convert the bean to an array
+    $mentorArray = $mentor->export();
+
+    // Unset the fields you don't need
+    unset($mentorArray['access_token'], $mentorArray['created'],
+        $mentorArray['post_code'],$mentorArray['street'],$mentorArray['street_no'],$mentorArray['street_side'],
+        $mentorArray['login_token'],$mentorArray['verify_email_token'],$mentorArray['phone'], $mentorArray['email'], 
+        $mentorArray['deleted_at'], $mentorArray['is_deleted'], $mentorArray['profile_picture']);
+    
+    $mentorNew = R::dispense('mentor');
+
+    // Import the values from the array into the new bean
+    $mentorNew->import($mentorArray);
+
+    return $mentorNew;
+
+}
+
 function getUserInfo($user_id){
     $user = R::findOne('user', 'id = ?', [$user_id]);
-    // unset to only get first_name and last_name
-    unset($user['access_token'], $user['created'],
-        $user['post_code'],$user['street'],$user['street_no'],$user['street_side'],
-        $user['login_token'],$user['verify_email_token'],$user['phone'], $user['email'], 
-        $user['deleted_at'], $user['is_deleted']);
-    return $user;
+    // Convert the bean to an array
+    $userArray = $user->export();
+    // Unset the fields you don't need
+    unset($userArray['access_token'], $userArray['created'],
+        $userArray['post_code'],$userArray['street'],$userArray['street_no'],$userArray['street_side'],
+        $userArray['login_token'],$userArray['verify_email_token'],$userArray['phone'], $userArray['email'], 
+        $userArray['deleted_at'], $userArray['is_deleted']);
+    
+    $userNew = R::dispense('user');
+
+    // Import the values from the array into the new bean
+    $userNew->import($userArray);
+
+    return $userNew;
+
 }
 
 function getContacts($userid, $usertype) {
