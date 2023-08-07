@@ -378,20 +378,20 @@ DI::rest()->get('/me/calls', function (RestData $data) {
     
     if($usertype == 'mentor') {
         // check if status is 0
-        $calls = R::find('call', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);        // $bookings = R::find('booking', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
+        $calls = R::find('call', 'mentor_id = ? AND (is_deleted IS NULL OR is_deleted != 1) LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);        // $bookings = R::find('booking', 'mentor_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($calls as $call) {
             if($call['user_id'] != null) $call['users'] = getUserInfo($call['user_id']);
             if($call['commune_id'] != null) $call['communes'] = getCommuneInfo($call['commune_id']);
         }
         $calls['total'] = R::count('call', 'mentor_id = ?', [$user['id']]);
     } else if($usertype == 'commune') {
-        $calls = R::find('call', 'commune_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
+        $calls = R::find('call', 'commune_id = ? AND (is_deleted IS NULL OR is_deleted != 1) LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($calls as $call) {
             $call['mentor'] = getMentorInfo($call['mentor_id']);
         }
         $calls['total'] = R::count('call', 'commune_id = ?', [$user['id']]);
     } else if($usertype == 'user') {
-        $calls = R::find('call', 'user_id = ? LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
+        $calls = R::find('call', 'user_id = ? AND (is_deleted IS NULL OR is_deleted != 1) LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($calls as $call) {
             $call['mentor'] = getMentorInfo($call['mentor_id']);
         }
@@ -426,6 +426,29 @@ DI::rest()->delete('/me/delete', function (RestData $data) {
 
     http(200, $user, true);
 }, ['auth.loggedIn']);
+
+DI::rest()->put('/me/calls/:id/delete', function (RestData $data) {
+    $user = $data->middleware['user'];
+    $usertype = $data->middleware['usertype'];
+    $body = $data->request->getBody();
+
+    if($usertype != 'mentor'){
+        http(403, "You are not a mentor.");
+    }
+
+    $call = R::findOne('call', 'id = ? AND mentor_id = ?', [$body['id'], $user['id']]);
+    if (!$call) {
+        http(404, "Call not found.");
+    }
+
+    $call['is_deleted'] = true;
+    $call['deleted_at'] = date('Y-m-d H:i:s');
+
+    R::store($call);
+
+    http(200, $call, true);
+}, ['auth.loggedIn']);
+
 
 
 
