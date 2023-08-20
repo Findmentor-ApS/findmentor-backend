@@ -141,3 +141,30 @@ DI::rest()->post('/mentors/profilecalled', function (RestData $data) {
 
   http(200, true);
 }, ['auth.loggedIn']);
+
+DI::rest()->put('/mentor/bookings/:id', function (RestData $data) {
+  $body = $data->request->getBody();
+  $user = $data->middleware['user'];
+  $usertype = $data->middleware['usertype'];
+
+  // if the userType is not a mentor, then return 404
+  if($usertype != 'mentor') {
+      http(404, "Du er ikke en mentor.");
+  }
+
+  $booking = R::findOne('booking', 'id = ? AND mentor_id = ?', [$body['id'], $user['id']]);
+  if (!$booking) {
+      http(404, "Booking ikke fundet.");
+  }
+
+  // check for each in body and update if value is null or empty, then skip
+  foreach ($body as $key => $value) {
+      if ($value) {
+          $booking->$key = $value;
+      }
+  }
+  
+  R::store($booking);
+
+  http(200, $booking, true);
+}, ['auth.loggedIn']);
