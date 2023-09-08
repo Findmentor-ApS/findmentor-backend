@@ -48,7 +48,7 @@ class DI
         $twilio = new Client(SELF::env('TWILIO_SID'), SELF::env('TWILIO_TOKEN'));
         $twilio->messages->create($to, [
             "body" => $body,
-            "from" => SELF::env('APP')
+            "from" => SELF::env('APP_NAME')
         ]);
     }
 

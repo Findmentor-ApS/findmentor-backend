@@ -1,7 +1,8 @@
 <?php
-function searchCompany($cvr) {
-    $client = new GuzzleHttp\Client();
-    $response = $client->request('POST', 'http://distribution.virk.dk/cvr-permanent/virksomhed/_search', [
+
+function searchCompany($cvr)
+{
+    $response = DI::http()->request('POST', DI::env('CVR_API'), [
         'auth' => [DI::env("CVR_USERNAME"), DI::env("CVR_PASSWORD")],
         'json' => [
             'query' => [

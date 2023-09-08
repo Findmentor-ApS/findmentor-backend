@@ -1,8 +1,8 @@
 <?php
 function mail_validate_email($m, $token, $type)
 {
-    $appname = DI::env('APPNAME');
-    $url = "https://" . DI::env('APP') . "/auth/validate_email/$type/$token";
+    $appname = DI::env('APP_NAME');
+    $url = "https://" . DI::env('APP_URL') . "/auth/validate_email/$type/$token";
     $subject = "Validate Email " . $appname;
     $message = <<<EOF
     <big><big>
@@ -22,8 +22,8 @@ EOF;
 
 function mail_validate_login($m, $token, $type)
 {
-    $appname = DI::env('APPNAME');
-    $url = "https://" . DI::env('APP') . "/auth/validate_login/$type/$token";
+    $appname = DI::env('APP_NAME');
+    $url = "https://" . DI::env('APP_URL') . "/auth/validate_login/$type/$token";
     $subject = "Validate login " . $appname;
     $message = <<<EOF
     Validate Email <a href='$url'>Here</a>
@@ -34,8 +34,8 @@ EOF;
 
 function mail_confirm($m, $token, $type)
 {
-    $appname = DI::env('APPNAME');
-    $url = "http://" . DI::env('APP') . "/auth/validate_email/$type/$token";
+    $appname = DI::env('APP_NAME');
+    $url = "http://" . DI::env('APP_URL') . "/auth/validate_email/$type/$token";
     $subject = "Validate Email " . $appname;
     $message = <<<EOF
     <big><big>

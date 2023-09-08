@@ -58,8 +58,7 @@ class DI
     }
 }
 
-include "../envs/.env.php";
-include "../envs/.env.global.php";
+include "../.env.php";
 include "../controllers/index.php";
 
 $groups = [];

@@ -7,7 +7,7 @@ include 'Discord.php';
 include 'DI.php';
 include "Redbean.php";
 
-R::setup('mysql:host=' . DI::env('DBHOST') . ';dbname=' . DI::env('DBNAME'), DI::env('DBUSER'), DI::env('DBPASS'));
+R::setup('mysql:host=' . DI::env('DB_HOST') . ';dbname=' . DI::env('DB_NAME'), DI::env('DB_USER'), DI::env('DB_PASS'));
 R::useFeatureSet('novice/latest');
 R::ext('xdispense', function ($type) {
     return R::getRedBean()->dispense($type);

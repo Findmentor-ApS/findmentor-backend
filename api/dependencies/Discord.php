@@ -32,6 +32,6 @@ class Discord {
                 ]
             ]
         ];
-        $this->send(DI::env("DISCORD_WEBHOOKS.ERROR"), $log);
+        $this->send(DI::env("DISCORD_WEBHOOKS_URL"), $log);
     }
 }

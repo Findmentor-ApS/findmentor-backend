@@ -1,20 +1,7 @@
 <?php
-$ENV['APPNAME'] = 'Findmentor';
-$ENV['APP'] = 'findmentor.localhost';
-$ENV['TWILIO_SID'] = 'AC6126c75e2973e9bd0176ffcab1a7a235';
-$ENV['TWILIO_TOKEN'] = '192f9afebb2eff2450acd28cfd47131a';
+$ENV = parse_ini_file('.env');
 $ENV['USER_REGISTER_TYPES'] = ['user', 'mentor', 'commune'];
 $ENV['USER_LOGIN_TYPES'] = ['user', 'mentor', 'commune'];
-$ENV['EMAIL_VALIDATE_TOKEN_LIFETIME'] = 60 * 60 * 24;
-$ENV['CVR_USERNAME'] = 'findmentor_CVR_I_SKYEN';
-$ENV['CVR_PASSWORD'] = 'd82694ba-035d-4ff6-9795-8c7cb6346ccb';
-$ENV['ENVS'] = ['LOCAL', 'DEV', 'PROD'];
-$ENV['DISCORD_WEBHOOKS'] = [
-    'ERROR' => 'https://discord.com/api/webhooks/921730406909366303/L4o-fLqyGvDYEfsL5aqCUKSNrVOX-0a_qPn2EPOlL9qHQIcitecWmfWmuG1xUyAZlEC8'
-];
-foreach ($ENV['ENVS'] as $v) {
-    $ENV[$v] = $ENV['ENV'] == $v;
-}
 
 $ENV['DATA'] = [
     'MENTOR_EXPERIENCES' => ['Demens', 'Erhvervet hjerneskade', 'Medfødt hjerneskade', 'Udviklingshæmning', 'Anden intellektuel/kognitiv forstyrrelse', 'Opmærksomhedsforstyrrelse', 'Autismespektrum', 'Udviklingsforstyrrelse af tale og sprog', 'Udviklingsforstyrrelse af skolefærdigheder', 'Udviklingsforstyrrelse af sansemotoriske færdigheder', 'Anden udviklingsforstyrrelse', 'Angst', 'Depression', 'Sorg', 'Forandret virkelighedsopfattelse', 'Personlighedsforstyrrelse', 'Spiseforstyrrelse', 'Tilknytningsforstyrrelse', 'Stressbelastning', 'Andre psykiske vanskeligheder', 'Kommunikationsnedsættelse', 'Mobilitetsnedsættelse', 'Hørenedsættelse', 'Synsnedsættelse', 'Medfødt døvblindhed', 'Erhvervet døvblindhed', 'Anden fysisk funktionsnedsættelse', 'Hjemløshed', 'Prostitution', 'Personfarlig kriminalitet', 'Ikke-personfarlig kriminalitet', 'Omsorgssvigt', 'Seksuelt overgreb', 'Voldeligt overgreb', 'Andet overgreb', 'Seksuelt krænkende adfærd', 'Selvskadende adfærd', 'Indadreagerende adfærd', 'Udadreagerende adfærd', 'Andet socialt problem', 'Stofmisbrug', 'Alkoholmisbrug', 'Ludomani', 'Multipel funktionsnedsættelse', 'Sjældent forekommende funktionsnedsættelse', 'Flygtninge', 'Krigsveteran', 'Radikalisering', 'Skilsmisse', 'Skolefravær'],
