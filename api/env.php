@@ -1,5 +1,5 @@
 <?php
-$ENV = parse_ini_file('.env');
+$ENV = parse_ini_file('../../.env');
 $ENV['USER_REGISTER_TYPES'] = ['user', 'mentor', 'commune'];
 $ENV['USER_LOGIN_TYPES'] = ['user', 'mentor', 'commune'];
 
