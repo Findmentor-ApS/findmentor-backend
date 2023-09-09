@@ -1,8 +1,7 @@
 <?php
 include __DIR__ . "/../vendor/autoload.php";
 include __DIR__ . "/../funcs/funcs.util.php";
-include __DIR__ . "/../envs/.env.php";
-include __DIR__ . "/../envs/.env.global.php";
+include __DIR__ . "/../env.php";
 include __DIR__ . "/../dependencies/index.php";
 
 $faker = Faker\Factory::create();
