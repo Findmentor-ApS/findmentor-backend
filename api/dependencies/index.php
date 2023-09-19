@@ -1,4 +1,5 @@
 <?php
+
 include 'Mail.php';
 include 'Rest.php';
 include 'Logger.php';
@@ -7,7 +8,16 @@ include 'Discord.php';
 include 'DI.php';
 include "Redbean.php";
 
-R::setup('mysql:host=' . DI::env('DB_HOST') . ';port=' . DI::env('DB_PORT') . ';dbname=' . DI::env('DB_NAME'), DI::env('DB_USER'), DI::env('DB_PASS'));
+try{
+    $pdo = new PDO('mysql:host=' . DI::env('DB_HOST') . ';port=' . DI::env('DB_PORT') . ';dbname=' . DI::env('DB_NAME'), DI::env('DB_USER'), DI::env('DB_PASS'), [
+        PDO::MYSQL_ATTR_SSL_CA => '../../../mysql-ssl-cert.crt',
+        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+    ]);
+} catch(PDOException $e){
+    DI::logger()->log($e->getmessage(), [], LOGGERS::database, LEVELS::error);
+}
+
+R::setup($pdo);
 R::useFeatureSet('novice/latest');
 R::ext('xdispense', function ($type) {
     return R::getRedBean()->dispense($type);
@@ -17,7 +27,7 @@ set_error_handler("error_handler");
 register_shutdown_function(function () {
     $error = error_get_last();
 
-    if ($error !== NULL) {
+    if ($error !== null) {
         $errno   = $error["type"];
         $errfile = $error["file"];
         $errline = $error["line"];

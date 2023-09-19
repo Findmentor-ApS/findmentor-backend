@@ -12,7 +12,7 @@ class DI
     private static GuzzleHttp\Client $http;
     private static Discord $discord;
 
-    public static function logger() {
+    public static function logger(): Log {
         if (!isset(SELF::$logger)) {
             SELF::$logger = new Log();
         }
