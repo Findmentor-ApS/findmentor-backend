@@ -2,7 +2,7 @@
 class Rest
 {
     private $request;
-    private $baseEntry = '';
+    private $baseEntry = '/api';
 
     public function __construct()
     {
