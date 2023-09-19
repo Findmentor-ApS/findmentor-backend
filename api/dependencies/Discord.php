@@ -13,25 +13,9 @@ class Discord {
     }
 
     public function error($error, $data) {
-        $fields = [];
-        foreach ($data as $name => $value) {
-            $fields[] = [
-                "name" => $name,
-                "value" => $value
-            ];
-        }
-        $log = [
-            "content" => "",
-            "username" => DI::env("APP") . " " . DI::env("ENV"),
-            "embeds" => [
-                [
-                    "color" => 14423100,
-                    "title" => "",
-                    "description" => $error,
-                    "fields" => $fields
-                ]
-            ]
-        ];
-        $this->send(DI::env("DISCORD_WEBHOOKS_URL"), $log);
+        $this->send(DI::env("DISCORD_WEBHOOKS_URL"), [
+            "content" => $error . '```' . json_encode($data, JSON_PRETTY_PRINT) . '```',
+            "username" => DI::env("APP_URL"),
+        ]);
     }
 }
