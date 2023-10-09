@@ -2,11 +2,12 @@
 class Rest
 {
     private $request;
-    private $baseEntry = '/api';
+    private $baseEntry = '';
 
     public function __construct()
     {
         $this->request = new Request();
+        $this->baseEntry = DI::env('API_ENTRY');
     }
 
     public function setBaseEntry($entry)
