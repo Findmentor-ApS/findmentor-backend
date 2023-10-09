@@ -264,10 +264,10 @@ function fetchProfile($user, $usertype) {
     }
 
     $user['bookingsTotal'] = R::count('booking', $usertype . '_id = ?', [$user['id']]);
-    $user['callsTotal'] = R::count('call', $usertype . '_id = ?', [$user['id']]);
+    $user['callsTotal'] = R::count('call', $usertype . '_id = ? AND  (is_deleted IS NULL OR is_deleted != 1)', [$user['id']]);
     $user['messagesTotal'] = R::count('messages', 'receiver_id = ? AND receiver_type = ?', [$user['id'], $usertype]);
     $user['bookingsTotalWeek'] = R::count('booking', $usertype . '_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
-    $user['callsTotalWeek'] = R::count('call', $usertype . '_id = ? AND created_at >= ? AND created_at < ?', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
+    $user['callsTotalWeek'] = R::count('call', $usertype . '_id = ? AND created_at >= ? AND created_at < ? AND  (is_deleted IS NULL OR is_deleted != 1)', [$user['id'], $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
     $user['messagesTotalWeek'] = R::count('messages', 'receiver_id = ? AND receiver_type = ? AND created_at >= ? AND created_at < ?', [$user['id'], $usertype, $start_of_week->format('Y-m-d'), $end_of_week->format('Y-m-d')]);
 
     return $user;

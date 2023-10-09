@@ -383,19 +383,19 @@ DI::rest()->get('/me/calls', function (RestData $data) {
             if($call['user_id'] != null) $call['users'] = getUserInfo($call['user_id']);
             if($call['commune_id'] != null) $call['communes'] = getCommuneInfo($call['commune_id']);
         }
-        $calls['total'] = R::count('call', 'mentor_id = ?', [$user['id']]);
+        $calls['total'] = R::count('call', 'mentor_id = ? AND (is_deleted IS NULL OR is_deleted != 1)', [$user['id']]);
     } else if($usertype == 'commune') {
         $calls = R::find('call', 'commune_id = ? AND (is_deleted IS NULL OR is_deleted != 1) LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($calls as $call) {
             $call['mentor'] = getMentorInfo($call['mentor_id']);
         }
-        $calls['total'] = R::count('call', 'commune_id = ?', [$user['id']]);
+        $calls['total'] = R::count('call', 'commune_id = ? AND (is_deleted IS NULL OR is_deleted != 1)', [$user['id']]);
     } else if($usertype == 'user') {
         $calls = R::find('call', 'user_id = ? AND (is_deleted IS NULL OR is_deleted != 1) LIMIT ? OFFSET ?', [$user['id'], $perPage, $offset]);
         foreach ($calls as $call) {
             $call['mentor'] = getMentorInfo($call['mentor_id']);
         }
-        $calls['total'] = R::count('call', 'user_id = ?', [$user['id']]);
+        $calls['total'] = R::count('call', 'user_id = ? AND (is_deleted IS NULL OR is_deleted != 1)', [$user['id']]);
     }
 
     http(200, $calls, true);
@@ -448,6 +448,7 @@ DI::rest()->put('/me/calls/:id/delete', function (RestData $data) {
 
     http(200, $call, true);
 }, ['auth.loggedIn']);
+
 
 
 
