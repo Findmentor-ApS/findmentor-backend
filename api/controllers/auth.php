@@ -57,9 +57,11 @@ DI::rest()->get('/auth/validate_email/:usertype/:token', function (RestData $dat
             $user['temp_email'] = null;
         }
         $user['email_verified'] = true;
-
+        $user['access_token'] = $usertype[0] . randstr(29);
+        
         R::store($user);
-        http(200,json_encode(array('success' => 'Email valideret')));
+        $user = fetchProfile($user, $usertype);
+        http(200,$user,true);
     }
     http(400);
 });
